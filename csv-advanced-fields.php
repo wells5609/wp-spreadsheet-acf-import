@@ -32,3 +32,15 @@
 // CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+add_action('admin_menu', 'csvaf_addadminmenu');
+
+/**
+ * Add csvaf options to the admin menu.
+ * 
+ * @access public
+ * @return void
+ */
+function csvaf_addadminmenu () {
+  add_options_page();
+}
