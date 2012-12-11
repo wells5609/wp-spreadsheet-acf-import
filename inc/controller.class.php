@@ -55,7 +55,10 @@ class CsvafController {
     // Permissions
     if (!current_user_can('manage_options')) {
       return wp_die(
-        __('You do not have sufficient permissions to access this page.')
+        __(
+          'You do not have sufficient permissions to access this page.'
+        , 'csvaf'
+        )
       );
     }
 
@@ -93,7 +96,7 @@ class CsvafController {
        || UPLOAD_ERR_OK != $_FILES['csvaf_data']['error'])
        ) {
       $error = CsvafView::Errorbanner(
-        'Encountered a problem while trying to upload your file.'
+        __('Encountered a problem while trying to upload your file.', 'csvaf')
       );
       return self::Uploadform($error);
     }
@@ -107,8 +110,11 @@ class CsvafController {
           )
        ) {
       $error = CsvafView::Errorbanner(
-          'File was not of the supported type. Please only upload Excel '
-        . 'spreadsheets and CSV files.'
+        __(
+            'File was not of the supported type. Please only upload Excel '
+          . 'spreadsheets and CSV files.'
+        , 'csvaf'
+        )
       );
       return self::Uploadform($error);
     }
