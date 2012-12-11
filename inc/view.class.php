@@ -1,15 +1,5 @@
 <?php
 
-/*
-  Plugin Name: CSV Advanced Fields Import
-  Plugin URI: http://github.com/thechurch/wp-csv-advanced-fields
-  Description: Import data from a CSV file with advanced fields.
-  Version: 0.1
-  Author: +THECHURCH+
-  Author URI: http://thechurch.co.nz/
-  License: MIT
-*/
-
 // The MIT License
 // 
 // Copyright (c) 2012 +THECHURCH+
@@ -33,36 +23,26 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-if (!defined('CSVAFPLUGINPATH')) {
-  define('CSVAFPLUGINPATH', plugin_dir_path(__FILE__));
-}
-
-require_once CSVAFPLUGINPATH . '/inc/controller.class.php';
-
 /**
- * Add csvaf options to the admin menu.
+ * View for the CSV Advanced Fields plugin.
  * 
- * @access public
- * @return void
+ * @package Csvaf
+ * @version 0.1
  */
-function csvaf_addadminmenu () {
-  CsvafController::Adminmenu();
-}
-
-/**
- * Add the upload form etc.
- * 
- * @access public
- * @return void
- */
-function csvaf_menupage () {
-  if (!current_user_can('manage_options')) {
-    return wp_die(__('You do not have sufficient permissions to acces this page.'));
+class CsvafView {
+  /**
+   * Render out the upload form.
+   * 
+   * @static
+   * @param   string  $action     The form action.
+   * @param   string  $noncekey   The nonce key.
+   * @param   string  $noncevalue The nonce value.
+   * @access  public
+   * @return  string              The HTML for the upload form.
+   */
+  public static function Uploadform ($action, $noncekey, $noncevalue) {
+    ob_start();
+    include CSVAFPLUGINPATH . '/template/upload-form.php';
+    return ob_get_clean();
   }
-
-  $out = CsvafView::Uploadform();
-
-  echo '<div class="wrap"><p>' . $out . '</p></div>';
 }
-
-add_action('admin_menu', 'csvaf_addadminmenu');
