@@ -33,36 +33,24 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+// noncekey
+if (!defined('CSVAFNONCEKEY')) {
+  define('CSVAFNONCEKEY', '_csvafnonce');
+}
+
+// Allowed file extensions.
+$CSVAFALLOWEDEXT = array(
+  'xlsx',  'xlsm',  'xls'
+, 'ods',   'slk',   'csv'
+);
+
 if (!defined('CSVAFPLUGINPATH')) {
   define('CSVAFPLUGINPATH', plugin_dir_path(__FILE__));
 }
 
 require_once CSVAFPLUGINPATH . '/inc/controller.class.php';
 
-/**
- * Add csvaf options to the admin menu.
- * 
- * @access public
- * @return void
- */
-function csvaf_addadminmenu () {
-  CsvafController::Adminmenu();
-}
+CsvafController::$ALLOWEDEXT = $CSVAFALLOWEDEXT;
 
-/**
- * Add the upload form etc.
- * 
- * @access public
- * @return void
- */
-function csvaf_menupage () {
-  if (!current_user_can('manage_options')) {
-    return wp_die(__('You do not have sufficient permissions to acces this page.'));
-  }
-
-  $out = CsvafView::Uploadform();
-
-  echo '<div class="wrap"><p>' . $out . '</p></div>';
-}
-
-add_action('admin_menu', 'csvaf_addadminmenu');
+// Add the admin menu hook
+add_action('admin_menu', array('CsvafController', 'Adminmenu'));

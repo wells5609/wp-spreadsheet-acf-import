@@ -28,11 +28,6 @@ require_once CSVAFPLUGINPATH . '/inc/view.class.php';
 
 require_once CSVAFPLUGINPATH . '/inc/PHPExcel/IOFactory.php';
 
-// noncekey
-if (!defined('CSVAFNONCEKEY')) {
-  define('CSVAFNONCEKEY', '_csvafnonce');
-}
-
 /**
  * Constroller for the CSV Advanced Fields plugin.
  * 
@@ -40,6 +35,15 @@ if (!defined('CSVAFNONCEKEY')) {
  * @version 0.1
  */
 class CsvafController {
+  /**
+   * Allowed file extensions for the file upload.
+   *
+   * @static
+   * @access  public
+   * @var     array
+   */
+  public static $ALLOWEDEXT = array();
+
   /**
    * Handle the incoming request.
    * 
@@ -69,25 +73,44 @@ class CsvafController {
   /**
    * Render the upload form
    * 
-   * @param string $action The form action.
+   * @param string $before  The form head.
+   * @param string $after   The form foot.
    * @static
    * @access public
    * @return void
    */
-  protected static function Uploadform ($action = '') {
-    if ('' != $action) {
-      $action = $_SERVER['REQUEST_URI'] . '&step=' . $action;
-    }
-
+  protected static function Uploadform ($before = '', $after = '') {
     // nonce stuff
     $noncevalue = wp_create_nonce(CSVAFNONCEKEY);
 
-    echo CsvafView::Uploadform($action, CSVAFNONCEKEY, $noncevalue);
+    echo CsvafView::Uploadform('', CSVAFNONCEKEY, $noncevalue, $before, $after);
   }
 
   protected static function Handleupload () {
-    if (!is_array($_FILES['csvaf_data'])) {
-      return self::Uploadform();
+    // Check we have a single file that hasn't errored.
+    if (  !is_array($_FILES['csvaf_data'])
+       || is_array($_FILES['csvaf_data']['name']
+       || UPLOAD_ERR_OK != $_FILES['csvaf_data']['error'])
+       ) {
+      $error = CsvafView::Errorbanner(
+        'Encountered a problem while trying to upload your file.'
+      );
+      return self::Uploadform($error);
+    }
+
+    // Check if we allow the given file extension.
+    // Don't bother checking mime type, as this is a admin page not for general
+    // consumption.
+    if (  !in_array(
+            pathinfo($_FILES['csvaf_data']['name'], PATHINFO_EXTENSION)
+          , self::$ALLOWEDEXT
+          )
+       ) {
+      $error = CsvafView::Errorbanner(
+          'File was not of the supported type. Please only upload Excel '
+        . 'spreadsheets and CSV files.'
+      );
+      return self::Uploadform($error);
     }
 
     // We have a file.
@@ -96,11 +119,15 @@ class CsvafController {
     $filename   = $tmpname . $_FILES['csvaf_data']['name'];
     move_uploaded_file($tmpname, $filename);
 
+    echo pathinfo($filename, PATHINFO_EXTENSION);
+
     $doc        = PHPExcel_IOFactory::load($filename);
     unlink($filename);
 
     $doc_array  = $doc->getActiveSheet()->toArray(null, true, true, true);
-    var_dump($doc_array);
+
+    // TODO : Render out the options for linking spreadsheet data to page types
+    // and fields.
   }
 
   /**

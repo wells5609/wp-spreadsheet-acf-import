@@ -1,4 +1,5 @@
 <div class="wrap">
+  <?php echo $headblock; ?>
   <form
     id="csvaf-upload"
     method="POST"
@@ -16,4 +17,5 @@
     <input type="file" name="csvaf_data" />
     <input type="submit" name="submit" value="Upload" />
   </form>
+  <?php echo $footblock; ?>
 </div>

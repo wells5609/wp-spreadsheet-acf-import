@@ -40,9 +40,17 @@ class CsvafView {
    * @access  public
    * @return  string              The HTML for the upload form.
    */
-  public static function Uploadform ($action, $noncekey, $noncevalue) {
+  public static function Uploadform (
+    $action, $noncekey, $noncevalue, $headblock, $footblock
+  ) {
     ob_start();
     include CSVAFPLUGINPATH . '/template/upload-form.php';
+    return ob_get_clean();
+  }
+
+  public static function Errorbanner ($message) {
+    ob_start();
+    include CSVAFPLUGINPATH . '/template/error-banner.php';
     return ob_get_clean();
   }
 }
