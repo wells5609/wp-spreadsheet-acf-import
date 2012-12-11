@@ -30,6 +30,64 @@
  * @version 0.1
  */
 class CsvafModel {
-  function __construct ($options) {
+  /**
+   * Get the available post types.
+   * 
+   * @static
+   * @access  public
+   * @return  array  The post types
+   */
+  public static function Getposttypes () {
+    return get_post_types();
+  }
+
+  /**
+   * Get fields for post type.
+   *
+   * If the advanced custom field plugin is installed then also include these
+   * fields.
+   * 
+   * @static
+   * @access  public
+   * @param   string  $posttype 
+   * @return  array   The fields.
+   */
+  public static function Getfieldsfortype ($posttype) {
+    global $acf;
+    $fields   = array();
+
+    // Advanced custom fields
+    if (array_key_exists('acf', $GLOBALS)) {
+      $fieldgroups  = $acf->get_field_groups();
+
+      foreach ($fieldgroups as $fieldgroup) {
+        $rules  = $fieldgroup['location']['rules'];
+        $passes = false;
+
+        foreach ($rules as $rule) {
+          if (
+             'post_type' == $rule['param']
+          && '==' == $rule['operator']
+          && $posttype == $rule['value']
+          ) {
+            $passes = true;
+            break;
+          }
+        }
+
+        if ($passes) {
+          foreach ($fieldgroup['fields'] as $field) {
+            $fields[]     = array(
+              'advanced'  => true
+            , 'id'        => $field['key']
+            , 'name'      => $field['label']
+            , 'key'       => $field['name']
+            );
+          }
+        }
+      }
+    }
+
+    var_dump($fields);
   }
 }

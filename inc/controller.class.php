@@ -127,13 +127,15 @@ class CsvafController {
 
     echo pathinfo($filename, PATHINFO_EXTENSION);
 
-    $doc        = PHPExcel_IOFactory::load($filename);
+    // $doc        = PHPExcel_IOFactory::load($filename);
     unlink($filename);
 
-    $doc_array  = $doc->getActiveSheet()->toArray(null, true, true, true);
+    // $doc_array  = $doc->getActiveSheet()->toArray(null, true, true, true);
 
     // TODO : Render out the options for linking spreadsheet data to page types
     // and fields.
+    CsvafModel::Getposttypes();
+    CsvafModel::Getfieldsfortype('vessel');
   }
 
   /**
