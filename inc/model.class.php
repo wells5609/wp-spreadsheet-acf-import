@@ -31,6 +31,21 @@
  */
 class CsvafModel {
   /**
+   * @static
+   * @access  public
+   * @var     array
+   */
+  public static $FIELDS = array(
+    'post_content'   => 'Content'
+  , 'post_date'      => 'Date: Y-m-d H:i:s'
+  , 'post_date_gmt'  => 'Date GMT: Y-m-d H:i:s'
+  , 'post_excerpt'   => 'Excerpt'
+  , 'post_name'      => 'Name'
+  , 'post_password'  => 'Password'
+  , 'post_title'     => 'Title'
+  );
+
+  /**
    * Get the available post types.
    * 
    * @static
@@ -55,6 +70,16 @@ class CsvafModel {
   public static function Getfieldsfortype ($posttype) {
     global $acf;
     $fields   = array();
+
+    // Normal fields
+    foreach (self::$FIELDS as $key => $name) {
+      $fields[] = array(
+        'advanced'  => false
+      , 'id'        => $key
+      , 'name'      => $name
+      , 'key'       => $key
+      );
+    }
 
     // Advanced custom fields
     if (array_key_exists('acf', $GLOBALS)) {
