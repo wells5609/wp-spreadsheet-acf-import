@@ -31,11 +31,14 @@
  */
 class CsvafModel {
   /**
+   * The default wordpress fields.
+   *
+   * @todo    Translatable / use __() somehow.
    * @static
    * @access  public
    * @var     array
    */
-  public static $FIELDS = array(
+  public static $WPFIELDS = array(
     'post_content'   => 'Content'
   , 'post_date'      => 'Date: Y-m-d H:i:s'
   , 'post_date_gmt'  => 'Date GMT: Y-m-d H:i:s'
@@ -43,6 +46,16 @@ class CsvafModel {
   , 'post_name'      => 'Name'
   , 'post_password'  => 'Password'
   , 'post_title'     => 'Title'
+  );
+
+  /**
+   * @static
+   * @access  public
+   * @var     array
+   */
+  public static $ACFFIELDS = array(
+    'text',   'textarea', 'editor'
+  , 'select', 'date'
   );
 
   /**
@@ -72,7 +85,7 @@ class CsvafModel {
     $fields   = array();
 
     // Normal fields
-    foreach (self::$FIELDS as $key => $name) {
+    foreach (self::$WPFIELDS as $key => $name) {
       $fields[] = array(
         'advanced'  => false
       , 'id'        => $key
@@ -102,6 +115,8 @@ class CsvafModel {
 
         if ($passes) {
           foreach ($fieldgroup['fields'] as $field) {
+            if (!in_array($field['type'], self::$ACFFIELDS)) continue;
+
             $fields[]     = array(
               'advanced'  => true
             , 'id'        => $field['key']
