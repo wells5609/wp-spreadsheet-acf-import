@@ -15,6 +15,13 @@
       <?php _e('Select spreadsheet file:', 'csvaf'); ?>
     </label>
     <input type="file" name="csvaf_data" />
+    <select name="csvaf_posttype">
+      <?php foreach ($posttypes as $posttype): ?>
+        <option value="<?php echo $posttype; ?>">
+          <?php echo $posttype; ?>
+        </option>
+      <?php endforeach; ?>
+    </select>
     <input type="submit" name="submit" value="Upload" />
   </form>
   <?php echo $footblock; ?>

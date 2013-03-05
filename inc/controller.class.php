@@ -45,6 +45,24 @@ class CsvafController {
   public static $ALLOWEDEXT = array();
 
   /**
+   * The current tmp file
+   *
+   * @static
+   * @access  public
+   * @var     string
+   */
+  public static $currentdatafile = null;
+
+  /**
+   * The current tmp file type
+   *
+   * @static
+   * @access  public
+   * @var     string
+   */
+  public static $currentreadertype = null;
+
+  /**
    * Handle the incoming request.
    * 
    * @static
@@ -85,8 +103,11 @@ class CsvafController {
   protected static function Uploadform ($before = '', $after = '') {
     // nonce stuff
     $noncevalue = wp_create_nonce(CSVAFNONCEKEY);
+    $posttypes  = CsvafModel::Getposttypes();
 
-    echo CsvafView::Uploadform('', CSVAFNONCEKEY, $noncevalue, $before, $after);
+    echo CsvafView::Uploadform(
+      '', CSVAFNONCEKEY, $noncevalue, $posttypes, $before, $after
+    );
   }
 
   protected static function Handleupload () {
@@ -124,18 +145,44 @@ class CsvafController {
     $tmpname    = $_FILES['csvaf_data']['tmp_name'];
     $filename   = $tmpname . $_FILES['csvaf_data']['name'];
     move_uploaded_file($tmpname, $filename);
+    $fileext    = pathinfo($filename, PATHINFO_EXTENSION);
 
-    echo pathinfo($filename, PATHINFO_EXTENSION);
+    if ('csv' === $fileext) {
+      $readertype = 'CSV';
+    } else {
+      $readertype = PHPExcel_IOFactory::identify($filename);
+    }
 
-    // $doc        = PHPExcel_IOFactory::load($filename);
-    unlink($filename);
+    self::$currentdatafile   = $filename;
+    self::$currentreadertype = $readertype;
 
-    // $doc_array  = $doc->getActiveSheet()->toArray(null, true, true, true);
+    $reader    = PHPExcel_IOFactory::createReader($readertype);
+    $doc       = $reader->load($filename);
+    $doc_array = $doc->getActiveSheet()->toArray(null, true, true, true);
+    $fields    = CsvafModel::Getfieldsfortype($_POST['csvaf_posttype']);
 
-    // TODO : Render out the options for linking spreadsheet data to page types
-    // and fields.
-    CsvafModel::Getposttypes();
-    CsvafModel::Getfieldsfortype('vessel');
+    self::Mapperform($doc_array, $fields);
+  }
+
+  /**
+   * Render out form for mapping things together.
+   *
+   * @static
+   * @access  public
+   * @param   array   $doc_array  The spreadsheet data
+   * @param   array   $fields     The fields
+   * @return  void
+   */
+  public static function Mapperform ($docarray, $fields) {
+    $headers    = $docarray[1];
+    $noncevalue = wp_create_nonce(CSVAFNONCEKEY);
+    $posttypes  = CsvafModel::Getposttypes();
+    $mapper     = CsvafView::Mapperform(
+      '', CSVAFNONCEKEY , $noncevalue, $headers
+    , $fields, $posttypes, self::$currentdatafile
+    );
+
+    echo self::Uploadform('', $mapper);
   }
 
   /**

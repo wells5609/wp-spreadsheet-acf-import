@@ -55,8 +55,47 @@ class CsvafModel {
    */
   public static $ACFFIELDS = array(
     'text',   'textarea', 'editor'
-  , 'select', 'date'
+  , 'select', 'post_object'
+  , 'date_picker', 'relationship'
+  , 'time_picker', 'true_false'
   );
+
+
+  /**
+   * Variable cache
+   *
+   * @static
+   * @access  public
+   * @var     array
+   */
+  public static $CACHE = array();
+
+  /**
+   * Get a cached value
+   *
+   * @static
+   * @access  public
+   * @param   string  $key
+   * @return  mixed
+   */
+  public static function Getcached ($key) {
+    if (isset(self::$CACHE[$key])) return self::$CACHE[$key];
+    return null;
+  }
+
+  /**
+   * Set a cached value
+   *
+   * @static
+   * @access  public
+   * @param   string  $key
+   * @param   mixed   $data
+   * @return  mixed
+   */
+  public static function Setcached ($key, $data) {
+    self::$CACHE[$key] = $data;
+    return $data;
+  }
 
   /**
    * Get the available post types.
@@ -66,7 +105,10 @@ class CsvafModel {
    * @return  array  The post types
    */
   public static function Getposttypes () {
-    return get_post_types();
+    $ret = self::Getcached('posttypes');
+    if ($ret) return $ret;
+
+    return self::Setcached('posttypes', get_post_types());
   }
 
   /**
@@ -91,6 +133,8 @@ class CsvafModel {
       , 'id'        => $key
       , 'name'      => $name
       , 'key'       => $key
+      , 'type'      => null
+      , 'format'    => null
       );
     }
 
@@ -117,17 +161,43 @@ class CsvafModel {
           foreach ($fieldgroup['fields'] as $field) {
             if (!in_array($field['type'], self::$ACFFIELDS)) continue;
 
-            $fields[]     = array(
-              'advanced'  => true
-            , 'id'        => $field['key']
-            , 'name'      => $field['label']
-            , 'key'       => $field['name']
+            $type   = null;
+            $format = null;
+
+            switch ($field['type']) {
+              case 'post_object':
+              case 'relationship':
+                $type = 'lookup';
+                break;
+
+              case 'date_picker':
+                $type   = 'format';
+                $format = $field['display_format'];
+                break;
+
+              case 'time_picker':
+                $type   = 'format';
+                $format = '';
+                if ($field['timepicker_show_date_format']) {
+                  $format .= $field['timepicker_date_format'] . ' ';
+                }
+                $format .= $field['timepicker_time_format'];
+                break;
+            }
+
+            $fields[] = array(
+              'advanced' => true
+            , 'id'       => $field['key']
+            , 'name'     => $field['label']
+            , 'key'      => $field['name']
+            , 'type'     => $type
+            , 'format'   => $format
             );
           }
         }
       }
     }
 
-    var_dump($fields);
+    return $fields;
   }
 }

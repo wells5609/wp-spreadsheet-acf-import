@@ -44,9 +44,8 @@ $CSVAFALLOWEDEXT = array(
 , 'ods',   'slk',   'csv'
 );
 
-if (!defined('CSVAFPLUGINPATH')) {
-  define('CSVAFPLUGINPATH', plugin_dir_path(__FILE__));
-}
+define('CSVAFPLUGINPATH', plugin_dir_path(__FILE__));
+define('CSVAFURL', plugin_dir_url(__FILE__));
 
 require_once CSVAFPLUGINPATH . '/inc/controller.class.php';
 

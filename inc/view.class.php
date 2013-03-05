@@ -37,14 +37,39 @@ class CsvafView {
    * @param   string  $action     The form action.
    * @param   string  $noncekey   The nonce key.
    * @param   string  $noncevalue The nonce value.
+   * @param   string  $posttypes  The post types to list
+   * @param   string  $headblock
+   * @param   string  $footblock
    * @access  public
    * @return  string              The HTML for the upload form.
    */
   public static function Uploadform (
-    $action, $noncekey, $noncevalue, $headblock, $footblock
+    $action, $noncekey, $noncevalue, $posttypes, $headblock, $footblock
   ) {
     ob_start();
     include CSVAFPLUGINPATH . '/template/upload-form.php';
+    return ob_get_clean();
+  }
+
+  /**
+   * Render out the upload form.
+   *
+   * @static
+   * @param   string  $action     The form action.
+   * @param   string  $noncekey   The nonce key.
+   * @param   string  $noncevalue The nonce value.
+   * @param   array   $headers    The data headers
+   * @param   array   $fields     The mapping fields
+   * @param   array   $posttypes  The post types
+   * @param   string  $filename   The upload filename
+   * @access  public
+   * @return  string              The HTML for the upload form.
+   */
+  public static function Mapperform (
+    $action, $noncekey, $noncevalue, $headers, $fields, $posttypes, $filename
+  ) {
+    ob_start();
+    include CSVAFPLUGINPATH . '/template/mapper-form.php';
     return ob_get_clean();
   }
 
