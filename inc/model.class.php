@@ -97,6 +97,28 @@ class CsvafModel {
   }
 
   /**
+   * Get the wordpress timezone
+   *
+   * @static
+   * @access  public
+   * @return  DateTimeZone
+   */
+  public static function Gettimezone () {
+    $timezone = self::Getcached('timezone');
+    if ($timezone) return $timezone;
+
+    $offset   = get_option('gmt_offset');
+    $timezone = timezone_name_from_abbr(null, $offset * 3600, true);
+
+    if ($timezone === false) {
+      $timezone = timezone_name_from_abbr(null, $offset * 3600, false);
+    }
+
+    $timezone = new DateTimeZone($timezone);
+    return self::Setcached('timezone', $timezone);
+  }
+
+  /**
    * Get the available post types.
    * 
    * @static
