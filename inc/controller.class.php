@@ -227,9 +227,11 @@ class CsvafController {
     , $docarray
     );
 
-    if (null !== $needunique) {
-      CsvafModel::Checkuniques($toinsert, $needunique);
+    if ($needunique) {
+      list($toinsert, $notunique) = CsvafModel::Checkuniques($posttype, $toinsert, $needunique);
     }
+
+    CsvafModel::Insertposts($posttype, $toinsert);
   }
 
   /**

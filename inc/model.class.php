@@ -469,4 +469,51 @@ ON ( `posts$posttype`.`ID` = `$columnname`.`post_id`
     if ($results) return false;
     return true;
   }
+
+  /**
+   * Insert some posts into the database (with acf's)
+   *
+   * @static
+   * @access  public
+   * @param   string    $posttype   The post type to check for
+   * @param   array     $toinsert   The data to check
+   * @return  void
+   */
+  public static function Insertposts ($posttype, $toinsert) {
+    foreach ($toinsert as $post) {
+      self::Insertpost($posttype, $post);
+    }
+  }
+
+  /**
+   * Insert a post into the database (with acf's)
+   *
+   * @static
+   * @access  public
+   * @param   string    $posttype   The post type to check for
+   * @param   array     $toinsert   The data to check
+   * @return  void
+   */
+  public static function Insertpost ($posttype, $toinsert) {
+    $thepost              = $toinsert['wp'];
+    $thepost['post_type'] = $posttype;
+
+    if (!isset($thepost['post_title'])) {
+      $thepost['post_title'] = '';
+    }
+    if (!isset($thepost['post_content'])) {
+      $thepost['post_content'] = '';
+    }
+    if (!isset($thepost['post_status'])) {
+      $thepost['post_status'] = 'publish';
+    }
+
+    $postid = wp_insert_post($thepost);
+
+    if (!$postid) return;
+
+    foreach ($toinsert['acf'] as $key => $value) {
+      update_post_meta($postid, $key, $value);
+    }
+  }
 }
