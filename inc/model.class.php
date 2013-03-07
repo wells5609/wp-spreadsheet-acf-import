@@ -149,14 +149,18 @@ class CsvafModel {
 
     // Normal fields
     foreach (self::$WPFIELDS as $key => $name) {
-      $fields[] = array(
+      $field = array(
         'advanced'  => false
       , 'id'        => $key
       , 'name'      => $name
       , 'key'       => $key
       , 'type'      => null
-      , 'format'    => null
+      , 'formatin'  => null
+      , 'formatout' => null
+      , 'default'   => null
       );
+
+      $fields[] = $field;
     }
 
     // Advanced custom fields
@@ -192,8 +196,9 @@ class CsvafModel {
                 break;
 
               case 'date_picker':
-                $type   = 'format';
-                $format = $field['display_format'];
+                $type      = 'format';
+                $formatin  = 'm/d/y';
+                $formatout = 'm/d/y';
                 break;
 
               case 'time_picker':
@@ -207,12 +212,16 @@ class CsvafModel {
             }
 
             $fields[] = array(
-              'advanced' => true
-            , 'id'       => $field['key']
-            , 'name'     => $field['label']
-            , 'key'      => $field['name']
-            , 'type'     => $type
-            , 'format'   => $format
+              'advanced'  => true
+            , 'id'        => $field['key']
+            , 'name'      => $field['label']
+            , 'key'       => $field['name']
+            , 'type'      => $type
+            , 'formatin'  => $formatin
+            , 'formatout' => $formatout
+            , 'default'   => isset($field['default_value'])
+                ? $field['default_value']
+                : null
             );
           }
         }
