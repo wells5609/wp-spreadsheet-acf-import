@@ -226,6 +226,10 @@ class CsvafController {
     , $fields
     , $docarray
     );
+
+    if (null !== $needunique) {
+      CsvafModel::Checkuniques($toinsert, $needunique);
+    }
   }
 
   /**

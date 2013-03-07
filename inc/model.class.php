@@ -366,4 +366,27 @@ class CsvafModel {
 
     return array($out, $badout, $needunique ? $uniqueor : null);
   }
+
+  /**
+   * Check if posts are unique
+   *
+   * @static
+   * @access  public
+   * @param   array   $inserts  The data to check
+   * @return  array
+   */
+  public static function Checkuniques ($inserts) {
+  }
+
+  /**
+   * Check if post is unique
+   *
+   * @static
+   * @access  public
+   * @param   array   $insert  The data to check
+   * @return  array            boolean, array($toreport)
+   */
+  public static function Checkunique ($insert) {
+  }
+
 }
