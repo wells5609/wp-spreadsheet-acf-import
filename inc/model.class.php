@@ -230,4 +230,140 @@ class CsvafModel {
 
     return $fields;
   }
+
+  /**
+   * Create a query from POST values
+   *
+   * @static
+   * @access  public
+   * @param   string  $posttype   The type of post to create
+   * @param   array   $fields     The post type fields
+   * @param   array   $docarray   Data source
+   * @return  array   The query
+   */
+  public static function Createinsertquery ($posttype, $fields, $docarray) {
+    $headers       = array_shift($docarray);
+    $columns       = array_keys($headers);
+    $fieldmap      = array();
+    $needunique    = false;
+    $uniqueor      = 'on' === $_POST['csvaf_unique_or'];
+
+    $out           = array();
+    $badout        = array();
+
+    $columnparsers = array();
+
+    foreach ($fields as $field) {
+      $fieldmap[$field['key']] = $field;
+    }
+
+    foreach ($columns as $column) {
+      $fieldkey  = "csvaf_column_{$column}_field";
+      if (!is_string($_POST[$fieldkey]) || !$fieldmap[$_POST[$fieldkey]]) continue;
+      $fieldkey  = $_POST[$fieldkey];
+
+      $field     = $fieldmap[$fieldkey];
+      $type      = $field['type'];
+
+      $default   = $_POST["csvaf_column_{$column}_default"];
+      $default   = $default ? $default : null;
+      $unique    = 'on' === $_POST["csvaf_column_{$column}_unique"];
+      $lookup    = null;
+      $formatin  = null;
+      $formatout = null;
+
+      switch ($type) {
+        case 'lookup':
+          $lookup = "csvaf_column_{$column}_type";
+          if (!is_string($_POST[$lookup])) continue;
+          $lookup = $_POST[$lookup];
+          break;
+
+        case 'format':
+          $formatin = "csvaf_column_{$column}_formatin";
+          if (!is_string($_POST[$formatin])) continue;
+          $formatin = $_POST[$formatin];
+
+          $formatout = "csvaf_column_{$column}_formatout";
+          if (!is_string($_POST[$formatout])) continue;
+          $formatout = $_POST[$formatout];
+          break;
+      }
+
+      if ($unique) $needunique = true;
+
+      $columnparsers[$column] = array(
+        'field'     => $field
+      , 'lookup'    => $lookup
+      , 'formatin'  => $formatin
+      , 'formatout' => $formatout
+      , 'unique'    => $unique
+      , 'default'   => $default
+      , 'type'      => $type
+      );
+    }
+
+    foreach ($docarray as $rownumber => $row) {
+      $toinsert = array(
+        'wp'  => array()
+      , 'acf' => array()
+      );
+
+      $badfields = array();
+
+      foreach ($row as $column => $value) {
+        if (!isset($columnparsers[$column])) continue;
+        $info  = $columnparsers[$column];
+
+        $toset = null;
+
+        switch ($info['type']) {
+          case 'lookup':
+            $value = trim($value);
+            $toset = get_page_by_title($value, null, $info['lookup']);
+            $toset = $toset ? $toset->ID : null;
+            break;
+
+          case 'format':
+            $toset = DateTime::createFromFormat(
+              $info['formatin']
+            , $value, self::Gettimezone()
+            );
+            $toset = $toset ? $toset->format($info['formatout']) : null;
+            break;
+
+          default:
+            $toset = $value;
+            break;
+        }
+
+        if (!$toset && $info['default']) {
+          $toset = $info['default'];
+        }
+
+        if (!$toset) {
+          $badfields[] = $info['field'];
+          continue;
+        }
+
+        if ($info['field']['advanced']) {
+          $toinsert['acf'][$info['field']['key']] = $toset;
+        } else {
+          $toinsert['wp'][$info['field']['key']] = $toset;
+        }
+
+        if ($info['unique']) {
+          $toinsert['unique'][] = $info['field'];
+        }
+      }
+
+      if (count($badfields)) {
+        $badout[$rownumber] = $badfields;
+      } else {
+        $out[] = $toinsert;
+      }
+    }
+
+    return array($out, $badout, $needunique ? $uniqueor : null);
+  }
 }
