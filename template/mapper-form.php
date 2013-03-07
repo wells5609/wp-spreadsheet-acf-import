@@ -40,10 +40,6 @@
   </script>
 
   <table>
-    <tr>
-      <td><label for="csvaf_unique_or">Unique OR mode:</label></td>
-      <td><input name="csvaf_unique_or" type="checkbox" /></td>
-    </tr>
     <?php foreach ($headers as $column => $header): ?>
       <?php
       $idprefix = 'csvaf_column_' . $column . '_';
