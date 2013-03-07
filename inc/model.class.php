@@ -40,12 +40,11 @@ class CsvafModel {
    */
   public static $WPFIELDS = array(
     'post_content'   => 'Content'
-  , 'post_date'      => 'Date: Y-m-d H:i:s'
-  , 'post_date_gmt'  => 'Date GMT: Y-m-d H:i:s'
   , 'post_excerpt'   => 'Excerpt'
-  , 'post_name'      => 'Name'
+  , 'post_name'      => 'Post Name'
   , 'post_password'  => 'Password'
   , 'post_title'     => 'Title'
+  , 'post_status'    => 'Post Status'
   );
 
   /**
