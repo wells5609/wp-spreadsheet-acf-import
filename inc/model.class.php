@@ -186,8 +186,9 @@ class CsvafModel {
           foreach ($fieldgroup['fields'] as $field) {
             if (!in_array($field['type'], self::$ACFFIELDS)) continue;
 
-            $type   = null;
-            $format = null;
+            $type      = null;
+            $formatin  = null;
+            $formatout = null;
 
             switch ($field['type']) {
               case 'post_object':
@@ -198,7 +199,7 @@ class CsvafModel {
               case 'date_picker':
                 $type      = 'format';
                 $formatin  = 'm/d/y';
-                $formatout = 'm/d/y';
+                $formatout = 'Ymd';
                 break;
 
               case 'time_picker':
@@ -208,6 +209,10 @@ class CsvafModel {
                   $format .= $field['timepicker_date_format'] . ' ';
                 }
                 $format .= $field['timepicker_time_format'];
+                break;
+
+              case 'true_false':
+                $type   = 'boolean';
                 break;
             }
 
@@ -331,6 +336,23 @@ class CsvafModel {
             $toset = $toset ? $toset->format($info['formatout']) : null;
             break;
 
+          case 'boolean':
+            $value = strtolower($value);
+
+            switch ($value) {
+            case 'yes':
+            case 'y':
+            case '1':
+            case 'true':
+              $toset = '1';
+              break;
+
+            default:
+              $toset = '0';
+              break;
+            }
+            break;
+
           default:
             $toset = $value;
             break;
@@ -339,11 +361,11 @@ class CsvafModel {
         if (!$toset && $info['default']) {
           $toset = $info['default'];
         }
-
-        if (!$toset) {
+        if (($info['type'] && !$toset) || ($info['unique'] && !$toset)) {
           $badfields[] = $info['field'];
           continue;
         }
+        if (!$toset) $toset = '';
 
         if ($info['field']['advanced']) {
           $toinsert['acf'][$info['field']['key']] = $toset;
