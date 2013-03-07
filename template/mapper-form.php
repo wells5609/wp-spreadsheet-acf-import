@@ -1,4 +1,4 @@
-<?php var_dump($fields); ?>
+<h2>Map columns to fields</h2>
 
 <form
   id="csvaf-mapper"
@@ -13,12 +13,25 @@
   />
   <input
     type="hidden"
+    name="csvaf_posttype"
+    value="<?php echo htmlentities($_POST['csvaf_posttype']); ?>"
+  />
+  <input
+    type="hidden"
     name="csvaf_filename"
     value="<?php echo htmlentities($filename); ?>"
   />
 
+  <link rel="stylesheet" href="<?php echo CSVAFURL . 'styles/mapper.css'; ?>" />
   <script type="text/javascript">
-    var CSVAFFIELDS = (<?php echo json_encode($fields); ?>)
+    <?php
+    $jsonfields = array();
+
+    foreach ($fields as $field) {
+      $jsonfields[$field['key']] = $field;
+    }
+    ?>
+    var CSVAFFIELDS = (<?php echo json_encode($jsonfields); ?>)
     var CSVAFTYPES  = (<?php echo json_encode(array_keys($posttypes)); ?>)
   </script>
   <script
@@ -26,39 +39,45 @@
     src="<?php echo CSVAFURL . 'scripts/mapper.js'; ?>">
   </script>
 
-  <ul>
+  <table>
+    <tr>
+      <td><label for="csvaf_unique_or">Unique OR mode:</label></td>
+      <td><input name="csvaf_unique_or" type="checkbox" /></td>
+    </tr>
     <?php foreach ($headers as $column => $header): ?>
       <?php
       $idprefix = 'csvaf_column_' . $column . '_';
       $lookup   = false;
       $format   = false;
       ?>
-    <li>
-      <label for="<?php echo $idprefix; ?>field">
-        <strong><?php echo $column; ?></strong>: <?php echo $header; ?>
-      </label>
-      <select name="<?php echo $idprefix; ?>field">
-        <option value="" selected="selected">DO NOT INSERT</option>
-        <?php foreach ($fields as $field): ?>
-        <option value="<?php echo $field['key']; ?>">
-          <?php echo $field['name']; ?>
-        </option>
-        <?php endforeach; ?>
-      </select>
+    <tr>
+      <td>
+        <label for="<?php echo $idprefix; ?>field">
+          <strong><?php echo $column; ?></strong>: <?php echo $header; ?>
+        </label>
+      </td>
 
-      <div class="optional-wrap"></div>
-
-      <label for="<?php echo $idprefix; ?>default">
-        <?php _e('Default:', 'csvaf'); ?>
-      </label>
-      <input
-        type="text"
-        name="<?php echo $idprefix; ?>default"
-        value="<?php echo ($field['default'] ? $fields['default'] : ''); ?>"
-      />
-    </li>
+      <td>
+        <select
+          class="column_field"
+          data-column-id="<?php echo $column; ?>"
+          name="<?php echo $idprefix; ?>field"
+        >
+          <option value="" selected="selected">DO NOT INSERT</option>
+          <?php foreach ($fields as $field): ?>
+          <option value="<?php echo $field['key']; ?>">
+            <?php echo $field['name']; ?>
+          </option>
+          <?php endforeach; ?>
+        </select>
+      </td>
+    </tr>
     <?php endforeach; ?>
-  </ul>
+  </table>
 
   <input type="submit" name="submit" value="Upload" />
+
+  <script type="text/javascript">
+    csvafmapperform()
+  </script>
 </form>
