@@ -85,6 +85,16 @@ class CsvafController {
     if (  is_string($_POST[CSVAFNONCEKEY])
        && wp_verify_nonce($_POST[CSVAFNONCEKEY], CSVAFNONCEKEY)
        ) {
+      if (
+         is_string($_POST['csvaf_filename'])
+      && is_string($_POST['csvaf_posttype'])
+      ) {
+        $filename = $_POST['csvaf_filename'];
+
+        if (!file_exists($filename)) return self::Uploadform();
+
+        return self::Handlemappingsubmit();
+      }
       return self::Handleupload();
     }
 
@@ -183,6 +193,39 @@ class CsvafController {
     );
 
     echo self::Uploadform('', $mapper);
+  }
+
+  /**
+   * Process the mapped values
+   *
+   * @static
+   * @access  public
+   * @return  void
+   */
+  public static function Handlemappingsubmit () {
+    $posttype = $_POST['csvaf_posttype'];
+    $filename = $_POST['csvaf_filename'];
+    $fileext  = pathinfo($filename, PATHINFO_EXTENSION);
+
+    if ('csv' === $fileext) {
+      $readertype = 'CSV';
+    } else {
+      $readertype = PHPExcel_IOFactory::identify($filename);
+    }
+
+    self::$currentdatafile   = $filename;
+    self::$currentreadertype = $readertype;
+
+    $reader    = PHPExcel_IOFactory::createReader($readertype);
+    $doc       = $reader->load($filename);
+    $docarray  = $doc->getActiveSheet()->toArray(null, true, true, true);
+    $fields    = CsvafModel::Getfieldsfortype($posttype);
+
+    list($toinsert, $toreport, $needunique) = CsvafModel::Createinsertquery(
+      $posttype
+    , $fields
+    , $docarray
+    );
   }
 
   /**
