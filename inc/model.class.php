@@ -246,7 +246,6 @@ class CsvafModel {
     $columns       = array_keys($headers);
     $fieldmap      = array();
     $needunique    = false;
-    $uniqueor      = 'on' === $_POST['csvaf_unique_or'];
 
     $out           = array();
     $badout        = array();
@@ -364,7 +363,7 @@ class CsvafModel {
       }
     }
 
-    return array($out, $badout, $needunique ? $uniqueor : null);
+    return array($out, $badout, $needunique);
   }
 
   /**
@@ -372,10 +371,22 @@ class CsvafModel {
    *
    * @static
    * @access  public
-   * @param   array   $inserts  The data to check
+   * @param   string    $posttype   The post type to check for
+   * @param   array     $inserts    The data to check
    * @return  array
    */
-  public static function Checkuniques ($inserts) {
+  public static function Checkuniques ($posttype, $inserts) {
+    $notunique = array();
+    $out       = array();
+
+    foreach ($inserts as $insert) {
+      $isunique = self::Checkunique($posttype, $insert);
+
+      if (!$isunique) $notunique[] = $insert;
+      else            $out[]       = $insert;
+    }
+
+    return array($out, $notunique);
   }
 
   /**
@@ -383,10 +394,57 @@ class CsvafModel {
    *
    * @static
    * @access  public
-   * @param   array   $insert  The data to check
-   * @return  array            boolean, array($toreport)
+   * @param   string    $posttype   The post type to check for
+   * @param   array     $insert     The data to check
+   * @return  boolean
    */
-  public static function Checkunique ($insert) {
-  }
+  public static function Checkunique ($posttype, $insert) {
+    global $wpdb;
 
+    $query = "SELECT
+  `posts$posttype`.`ID`
+FROM $wpdb->posts AS `posts{$posttype}`";
+
+    $innerjoins = array();
+    $wheres     = array("`posts$posttype`.`post_type` = '$posttype'");
+
+    foreach ($insert['unique'] as $field) {
+      if (!$field['advanced']) {
+        $wheres[] = $wpdb->prepare(
+          "`posts$posttype`.`{$field['key']}` = %s"
+        , $insert['wp'][$field['key']]
+        );
+        continue;
+      }
+
+      switch ($field['type']) {
+      case 'lookup':
+        $valuesub = '%d';
+        break;
+      default:
+        $valuesub = '%s';
+        break;
+      }
+
+      $columnname = "field{$field['key']}";
+
+      $innerjoins[] = $wpdb->prepare(
+        "INNER JOIN $wpdb->postmeta AS `$columnname`
+ON ( `posts$posttype`.`ID` = `$columnname`.`post_id`
+ AND `$columnname`.`meta_key` = '{$field['key']}'
+ AND `$columnname`.`meta_value` = $valuesub
+   )"
+        , $insert['acf'][$field['key']]
+      );
+    }
+
+    $innerjoins = "\n" . implode("\n", $innerjoins);
+    $wheres     = implode("\nAND", $wheres);
+    $query      = $query . $innerjoins . "\nWHERE\n" . $wheres . "\nLIMIT 0, 1";
+
+    $results = $wpdb->query($query);
+
+    if ($results) return false;
+    return true;
+  }
 }
