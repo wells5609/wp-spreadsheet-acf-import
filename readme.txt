@@ -3,7 +3,7 @@ Contributors: timsmart
 Tags: import, spreadsheet, acf, csv
 Requires at least: 3.0.0
 Tested up to: 3.5
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: MIT
 Plugin URI: https://github.com/thechurch/wp-spreadsheet-acf-import
 Author URI: http://thechurch.co.nz/
@@ -23,8 +23,8 @@ after being the actual data.
 Select the file you want to upload, the post type to create, then click Upload.
 The next step you choose which columns to map to the fields. Depending on the
 field type different options will appear. Dates will have a format in and format
-out text entry, which accepts PHP date() format strings. The default format out
-for ACF date pickers is automatically inserting for you. Post objects and
+out text entry which accepts PHP date() format strings. The standard format out
+for ACF date pickers is automatically inserted for you. Post objects and
 relationships will do a reverse lookup in the post titles. This may have more
 flexibility in the future.
 
@@ -32,6 +32,9 @@ Click Upload and the posts will be created. A log is then generated if errors /
 warnings are produced.
 
 == Changelog ==
+
+= 0.1.1 =
+* Readme update
 
 = 0.1.0 =
 * Initial version
