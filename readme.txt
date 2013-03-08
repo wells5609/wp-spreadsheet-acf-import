@@ -3,7 +3,7 @@ Contributors: timsmart
 Tags: import, spreadsheet, acf, csv
 Requires at least: 3.0.0
 Tested up to: 3.5
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: MIT
 Plugin URI: https://github.com/thechurch/wp-spreadsheet-acf-import
 Author URI: http://thechurch.co.nz/
@@ -32,6 +32,10 @@ Click Upload and the posts will be created. A log is then generated if errors /
 warnings are produced.
 
 == Changelog ==
+
+= 0.1.2 =
+* Add usage text
+* Move to tools menu
 
 = 0.1.1 =
 * Readme update
