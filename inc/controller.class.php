@@ -247,7 +247,7 @@ class CsvafController {
    * @return void
    */
   public static function Adminmenu () {
-    add_menu_page(
+    add_management_page(
       'Spreadsheet + ACF Import'
     , 'Upload Spreadsheet'
     , 'import'
