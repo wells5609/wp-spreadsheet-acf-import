@@ -248,10 +248,10 @@ class CsvafController {
    */
   public static function Adminmenu () {
     add_menu_page(
-      'CSV Advanced Fields'
-    , 'Upload CSV'
+      'Spreadsheet + ACF Import'
+    , 'Upload Spreadsheet'
     , 'import'
-    , 'upload-csv'
+    , 'upload-spreadsheet'
     , array('CsvafController', 'Handle')
     );
   }

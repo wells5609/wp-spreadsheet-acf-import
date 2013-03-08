@@ -1,11 +1,11 @@
 <?php
 
 /*
-  Plugin Name: CSV Advanced Fields Import
-  Plugin URI: http://github.com/thechurch/wp-csv-advanced-fields
-  Description: Import data from a CSV file with advanced fields.
-  Version: 0.1
-  Author: +THECHURCH+
+  Plugin Name: Spreadsheet + ACF Import
+  Plugin URI: https://github.com/thechurch/wp-spreadsheet-acf-import
+  Description: Import data from a spreadsheet file with advanced custom fields.
+  Version: 0.1.0
+  Author: The Church
   Author URI: http://thechurch.co.nz/
   License: MIT
 */
