@@ -308,9 +308,13 @@ class CsvafModel {
     }
 
     foreach ($docarray as $rownumber => $row) {
+      $realrow = $rownumber + 2;
+
       $toinsert = array(
-        'wp'  => array()
-      , 'acf' => array()
+        'wp'      => array()
+      , 'acf'     => array()
+      , 'row'     => $rownumber
+      , 'realrow' => $realrow
       );
 
       $badfields = array();
@@ -379,7 +383,7 @@ class CsvafModel {
       }
 
       if (count($badfields)) {
-        $badout[$rownumber] = $badfields;
+        $badout[$realrow] = $badfields;
       } else {
         $out[] = $toinsert;
       }

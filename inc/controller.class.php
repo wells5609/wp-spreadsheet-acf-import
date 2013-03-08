@@ -228,10 +228,15 @@ class CsvafController {
     );
 
     if ($needunique) {
-      list($toinsert, $notunique) = CsvafModel::Checkuniques($posttype, $toinsert, $needunique);
+      list($toinsert, $notunique) = CsvafModel::Checkuniques(
+        $posttype, $toinsert, $needunique
+      );
     }
 
     CsvafModel::Insertposts($posttype, $toinsert);
+
+    $log = CsvafView::Warninglog($toreport, $notunique);
+    echo self::Uploadform('', $log);
   }
 
   /**

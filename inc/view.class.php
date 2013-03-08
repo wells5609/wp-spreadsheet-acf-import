@@ -73,6 +73,19 @@ class CsvafView {
     return ob_get_clean();
   }
 
+  /**
+   * Render the warning log
+   *
+   * @static
+   * @param   arary   $validations  Inserts which failed to validate.
+   * @param   array   $uniques      Inserts which were not unique.
+   */
+  public static function Warninglog ($validations, $uniques) {
+    ob_start();
+    include CSVAFPLUGINPATH . '/template/warning-log.php';
+    return ob_get_clean();
+  }
+
   public static function Errorbanner ($message) {
     ob_start();
     include CSVAFPLUGINPATH . '/template/error-banner.php';
