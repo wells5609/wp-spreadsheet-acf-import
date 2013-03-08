@@ -55,6 +55,7 @@ class CsvafView {
    * Render out the upload form.
    *
    * @static
+   * @access  public
    * @param   string  $action     The form action.
    * @param   string  $noncekey   The nonce key.
    * @param   string  $noncevalue The nonce value.
@@ -62,7 +63,6 @@ class CsvafView {
    * @param   array   $fields     The mapping fields
    * @param   array   $posttypes  The post types
    * @param   string  $filename   The upload filename
-   * @access  public
    * @return  string              The HTML for the upload form.
    */
   public static function Mapperform (
@@ -74,11 +74,26 @@ class CsvafView {
   }
 
   /**
+   * Render the help content
+   *
+   * @static
+   * @access  public
+   * @return  string
+   */
+  public static function Help () {
+    ob_start();
+    include CSVAFPLUGINPATH . '/template/help.php';
+    return ob_get_clean();
+  }
+
+  /**
    * Render the warning log
    *
    * @static
-   * @param   arary   $validations  Inserts which failed to validate.
-   * @param   array   $uniques      Inserts which were not unique.
+   * @access  public
+   * @param   array   $validations
+   * @param   array   $uniques
+   * @return  string
    */
   public static function Warninglog ($validations, $uniques) {
     ob_start();

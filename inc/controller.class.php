@@ -115,6 +115,10 @@ class CsvafController {
     $noncevalue = wp_create_nonce(CSVAFNONCEKEY);
     $posttypes  = CsvafModel::Getposttypes();
 
+    if (!$after) {
+      $after = CsvafView::Help();
+    }
+
     echo CsvafView::Uploadform(
       '', CSVAFNONCEKEY, $noncevalue, $posttypes, $before, $after
     );
