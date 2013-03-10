@@ -13,7 +13,7 @@ GITPATH="$CURRENTDIR" # this file should be in the base of your git repository
 # svn config
 SVNPATH="/tmp/$PLUGINSLUG" # path to a temp SVN repo. No trailing slash required and don't add trunk.
 SVNURL="http://plugins.svn.wordpress.org/spreadsheet-acf-import" # Remote SVN repo on wordpress.org, with no trailing slash
-SVNUSER="The Church" # your svn username
+SVNUSER="the-church" # your svn username
 
 
 # Let's begin...
@@ -35,7 +35,7 @@ if [ "$NEWVERSION1" != "$NEWVERSION2" ]; then echo "Version in readme.txt & $MAI
 
 echo "Versions match in readme.txt and $MAINFILE. Let's proceed..."
 
-if git show-ref --tags --quiet --verify -- "refs/tags/$NEWVERSION1"
+if git show-ref --tags --quiet --verify -- "refs/tags/v$NEWVERSION1"
 	then 
 		echo "Version $NEWVERSION1 already exists as git tag. Exiting...."; 
 		exit 1; 
@@ -46,12 +46,12 @@ fi
 cd $GITPATH
 echo -e "Enter a commit message for this new version: \c"
 read COMMITMSG
-git commit -am "$COMMITMSG"
+git commit --signoff -am "$COMMITMSG"
 
 echo "Tagging new version in git"
-git tag -a "$NEWVERSION1" -m "Tagging version $NEWVERSION1"
+git tag -a "v$NEWVERSION1" -m "Version $NEWVERSION1"
 
-echo "Pushing latest commit to origin, with tags"
+echo "Syncing with origin"
 git push origin master
 git push origin master --tags
 
@@ -72,13 +72,13 @@ echo "Changing directory to SVN and committing to trunk"
 cd $SVNPATH/trunk/
 # Add all new files that are not set to be ignored
 svn status | grep -v "^.[ \t]*\..*" | grep "^?" | awk '{print $2}' | xargs svn add
-svn commit --username=$SVNUSER -m "$COMMITMSG"
+svn commit --username="$SVNUSER" -m "$COMMITMSG"
 
 echo "Creating new SVN tag & committing it"
 cd $SVNPATH
 svn copy trunk/ tags/$NEWVERSION1/
 cd $SVNPATH/tags/$NEWVERSION1
-svn commit --username=$SVNUSER -m "Tagging version $NEWVERSION1"
+svn commit --username="$SVNUSER" -m "Tagging version $NEWVERSION1"
 
 echo "Removing temporary directory $SVNPATH"
 rm -fr $SVNPATH/
