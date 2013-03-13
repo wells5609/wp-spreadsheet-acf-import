@@ -5,7 +5,7 @@ Author URI: http://thechurch.co.nz/
 Tags: import, spreadsheet, acf, csv
 Requires at least: 3.0.0
 Tested up to: 3.5
-Stable tag: 0.1.3
+Stable tag: 0.1.4
 License: MIT
 
 Import data from spreadsheets into posts with Advanced Custom Fields.
