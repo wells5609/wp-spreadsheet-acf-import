@@ -372,7 +372,7 @@ class CsvafModel {
         if (!$toset) $toset = '';
 
         if ($info['field']['advanced']) {
-          $toinsert['acf'][$info['field']['key']] = $toset;
+          $toinsert['acf'][$info['field']['id']] = $toset;
         } else {
           $toinsert['wp'][$info['field']['key']] = $toset;
         }
@@ -460,7 +460,7 @@ ON ( `posts$posttype`.`ID` = `$columnname`.`post_id`
  AND `$columnname`.`meta_key` = '{$field['key']}'
  AND `$columnname`.`meta_value` = $valuesub
    )"
-        , $insert['acf'][$field['key']]
+        , $insert['acf'][$field['id']]
       );
     }
 
@@ -517,7 +517,8 @@ ON ( `posts$posttype`.`ID` = `$columnname`.`post_id`
     if (!$postid) return;
 
     foreach ($toinsert['acf'] as $key => $value) {
-      update_post_meta($postid, $key, $value);
+      update_field($key, $value, $postid);
+      // update_post_meta($postid, $key, $value);
     }
   }
 }
