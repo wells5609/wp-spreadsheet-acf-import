@@ -164,7 +164,7 @@ class CsvafModel {
     }
 
     // Advanced custom fields
-    if (array_key_exists('acf', $GLOBALS)) {
+    if ($acf && method_exists($acf, 'get_field_groups')) {
       $fieldgroups  = $acf->get_field_groups();
 
       foreach ($fieldgroups as $fieldgroup) {
