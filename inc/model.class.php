@@ -132,110 +132,138 @@ class CsvafModel {
     return self::Setcached('posttypes', get_post_types());
   }
 
-  /**
-   * Get fields for post type.
-   *
-   * If the advanced custom field plugin is installed then also include these
-   * fields.
-   * 
-   * @static
-   * @access  public
-   * @param   string  $posttype 
-   * @return  array   The fields.
-   */
-  public static function Getfieldsfortype ($posttype) {
-    global $acf;
-    $fields   = array();
 
-    // Normal fields
-    foreach (self::$WPFIELDS as $key => $name) {
-      $field = array(
-        'advanced'  => false
-      , 'id'        => $key
-      , 'name'      => $name
-      , 'key'       => $key
-      , 'type'      => null
-      , 'formatin'  => null
-      , 'formatout' => null
-      , 'default'   => null
-      );
 
-      $fields[] = $field;
-    }
-
-    // Advanced custom fields
-    if ($acf && method_exists($acf, 'get_field_groups')) {
-      $fieldgroups  = $acf->get_field_groups();
-
-      foreach ($fieldgroups as $fieldgroup) {
-        $rules  = $fieldgroup['location']['rules'];
-        $passes = false;
-
-        foreach ($rules as $rule) {
-          if (
-             'post_type' == $rule['param']
-          && '==' == $rule['operator']
-          && $posttype == $rule['value']
-          ) {
-            $passes = true;
-            break;
-          }
-        }
-
-        if ($passes) {
-          foreach ($fieldgroup['fields'] as $field) {
-            if (!in_array($field['type'], self::$ACFFIELDS)) continue;
-
-            $type      = null;
-            $formatin  = null;
-            $formatout = null;
-
-            switch ($field['type']) {
-              case 'post_object':
-              case 'relationship':
-                $type = 'lookup';
-                break;
-
-              case 'date_picker':
-                $type      = 'format';
-                $formatin  = 'm/d/y';
-                $formatout = 'Ymd';
-                break;
-
-              case 'time_picker':
-                $type   = 'format';
-                $format = '';
-                if ($field['timepicker_show_date_format']) {
-                  $format .= $field['timepicker_date_format'] . ' ';
-                }
-                $format .= $field['timepicker_time_format'];
-                break;
-
-              case 'true_false':
-                $type   = 'boolean';
-                break;
-            }
-
-            $fields[] = array(
-              'advanced'  => true
-            , 'id'        => $field['key']
-            , 'name'      => $field['label']
-            , 'key'       => $field['name']
-            , 'type'      => $type
-            , 'formatin'  => $formatin
-            , 'formatout' => $formatout
-            , 'default'   => isset($field['default_value'])
-                ? $field['default_value']
-                : null
-            );
-          }
-        }
-      }
-    }
-
-    return $fields;
-  }
-
+/**
+ * Get fields for post type.
+ *
+ * If the advanced custom field plugin is installed then also include these
+ * fields.
+ *
+ *	Modified 7/14/13 - does not check post-type anymore 
+ *	(i.e. it returns all registered fields)
+ *	Uses global acf_register_field_group
+ * 
+ * @static
+ * @access  public
+ * @param   string  $posttype 
+ * @return  array   The fields.
+**/
+	public static function Getfieldsfortype ($posttype) {
+		//global $acf;
+		$fields   = array();
+		
+		if ( !empty($GLOBALS['acf_register_field_group']) ) {
+			$acf = $GLOBALS['acf_register_field_group'];	
+		}
+			
+		// Normal fields
+		foreach (self::$WPFIELDS as $key => $name) {
+		  $field = array(
+			'advanced'  => false
+		  , 'id'        => $key
+		  , 'name'      => $name
+		  , 'key'       => $key
+		  , 'type'      => null
+		  , 'formatin'  => null
+		  , 'formatout' => null
+		  , 'default'   => null
+		  );
+	
+		  $fields[] = $field;
+		}
+	
+		// Advanced custom fields
+		if ($acf) {
+			
+			$fieldgroups = array();
+		  
+			foreach($acf as $fieldgroup) {
+				$fieldgroups[] = $fieldgroup;  
+			}
+			
+			  
+			foreach ($fieldgroups as $fieldgroup) :
+				$locations  = $fieldgroup['location'];
+				$rules = array();
+			
+				foreach($locations as $location) :
+					$rules[] = $location;
+				endforeach;
+				
+				// just fake it.
+				$passes = true;
+				
+				/* doesn't work (old code)
+					foreach ($rules as $rule) {
+						if ('post_type' == $rule['param'] && '==' == $rule['operator'] && $posttype == $rule['value'] ) {
+							$passes = true;
+							break;
+						}
+					}
+				*/
+		
+				if ($passes) {
+					
+					foreach ($fieldgroup['fields'] as $field) {
+					
+						//if (!in_array($field['type'], self::$ACFFIELDS)) continue;
+			
+						$type      = null;
+						$formatin  = null;
+						$formatout = null;
+						
+						switch ($field['type']) {
+						
+							case 'post_object':
+							case 'relationship':
+								$type = 'lookup';
+								break;
+							
+							case 'date_picker':
+								$type      = 'format';
+								$formatin  = 'm/d/y';
+								$formatout = 'Ymd';
+								break;
+							
+							case 'time_picker':
+								$type   = 'format';
+								$format = '';
+								if ($field['timepicker_show_date_format']) {
+								  $format .= $field['timepicker_date_format'] . ' ';
+								}
+								$format .= $field['timepicker_time_format'];
+								break;
+							
+							case 'true_false':
+								$type   = 'boolean';
+								break;
+						
+						}
+			
+						$fields[] = array(
+							'advanced'  => true, 
+							'id'        => $field['key'], 
+							'name'      => $field['label'], 
+							'key'       => $field['name'], 
+							'type'      => $type, 
+							'formatin'  => $formatin, 
+							'formatout' => $formatout, 
+							'default'   => isset($field['default_value']) ? $field['default_value'] : null
+						);
+					}
+			
+				} // passes
+			
+			endforeach;
+			
+		}// if acf
+	
+		return $fields;
+		
+	}
+	
+	
   /**
    * Create a query from POST values
    *
